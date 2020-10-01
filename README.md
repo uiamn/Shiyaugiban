@@ -7,3 +7,6 @@ A shougi application based on Electron
 yarn
 yarn dev
 ```
+
+## License
+MIT
