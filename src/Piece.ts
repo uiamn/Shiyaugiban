@@ -10,4 +10,9 @@ export const promote = (p: Piece) => {
   else return p + 7
 }
 
+export const disPromote = (p: Piece) => {
+  if((!isEnemy(p) && p < Piece.UM) || (isEnemy(p) && p < Piece.EUM)) return p - 8
+  else return p - 7
+}
+
 export const isPromoted = (p: Piece) => (!isEnemy(p) && Piece.OU < p) || (isEnemy(p) && Piece.EOU < p)

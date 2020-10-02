@@ -1,5 +1,5 @@
 import React from 'react'
-import { Piece, isEnemy, promote, isPromoted } from './Piece'
+import { Piece, isEnemy, promote, isPromoted, disPromote } from './Piece'
 import { isLegalMove } from './isLegalMove'
 import './Board.css'
 
@@ -11,7 +11,9 @@ const pieceChar = (p: Piece) => {
 interface IMainState {
   board: Piece[],
   selected: number,
-  isMyTurn: boolean
+  isBlackTurn: boolean,
+  bStand: Piece[],
+  wStand: Piece[]
 }
 
 class Main extends React.Component<{}, IMainState> {
@@ -31,36 +33,49 @@ class Main extends React.Component<{}, IMainState> {
         Piece.KY, Piece.KE, Piece.GI, Piece.KI, Piece.OU, Piece.KI, Piece.GI, Piece.KE, Piece.KY,
       ],
       selected: -1,
-      isMyTurn: true
+      isBlackTurn: true,
+      bStand: [],
+      wStand: []
     }
   }
+
 
   render() {
     return (
       <div>
         <Board
-          board={this.state.board} selected={this.state.selected} clickHandler={this.clickHandler}
+          board={this.state.board} selected={this.state.selected} move={this.move}
         />
+        <Stand stand={this.state.wStand} move={this.move} isBlack={true} />
+        <Stand stand={this.state.bStand} move={this.move} isBlack={false} />
       </div>
     )
   }
 
-  clickHandler = (i: number) => {
+  move = (i: number) => {
     if(this.state.selected === -1) {
-      if(this.state.board[i] !== Piece.EMPTY && (this.state.isMyTurn !== isEnemy(this.state.board[i]))) {
+      if(this.state.board[i] !== Piece.EMPTY && (this.state.isBlackTurn !== isEnemy(this.state.board[i]))) {
         this.setState({selected: i})
       } else {
         this.setState({selected: -1})
       }
     } else {
       if(isLegalMove(this.state.selected, i, this.state.board)) {
-        const newPiece = ((this.state.isMyTurn && i < 27) || (!this.state.isMyTurn && i > 53)) && !isPromoted(this.state.board[this.state.selected]) && window.confirm('promotion?')
+        const newPiece = ((this.state.isBlackTurn && i < 27) || (!this.state.isBlackTurn && i > 53)) && !isPromoted(this.state.board[this.state.selected]) && window.confirm('promotion?')
                          ?promote(this.state.board[this.state.selected])
                          :this.state.board[this.state.selected]
 
         const newBoard = this.state.board.map((p, j) => j===i?newPiece:j===this.state.selected?Piece.EMPTY:p)
-        this.setState({selected: -1, board: newBoard, isMyTurn: !this.state.isMyTurn})
-      } else if(this.state.board[i] !== Piece.EMPTY && (this.state.isMyTurn !== isEnemy(this.state.board[i]))) {
+
+        const takenPiece = this.state.board[i]===Piece.EMPTY?undefined:isPromoted(this.state.board[i])?disPromote(this.state.board[i]):this.state.board[i]
+        const newStand = (this.state.isBlackTurn?this.state.bStand:this.state.wStand)
+        if(takenPiece !== undefined) newStand.push(takenPiece + (this.state.isBlackTurn?-14:14))
+
+        const newState = {selected: -1, board: newBoard, isBlackTurn: !this.state.isBlackTurn}
+        Object.assign(newState, {[(this.state.isBlackTurn?'bStand':'wStand')]: newStand})
+
+        this.setState(newState)
+      } else if(this.state.board[i] !== Piece.EMPTY && (this.state.isBlackTurn !== isEnemy(this.state.board[i]))) {
         this.setState({selected: i})
       } else {
         this.setState({selected: -1})
@@ -69,10 +84,10 @@ class Main extends React.Component<{}, IMainState> {
   }
 }
 
-class Board extends React.Component<{board: Piece[], selected: number, clickHandler: (_: number) => void}> {
+class Board extends React.Component<{board: Piece[], selected: number, move: (_: number) => void}> {
   render() {
     const Square: React.FC<{row: number, col: number, p: Piece}> = (props) => (
-      <td style={{border: 'solid 1px', backgroundColor: (props.row*9+props.col)===this.props.selected?'#FF0000':''}} key={`square${props.row*9+props.col}`} onClick={() => this.props.clickHandler(props.row*9+props.col)}>{pieceChar(props.p)}</td>
+      <td style={{border: 'solid 1px', backgroundColor: (props.row*9+props.col)===this.props.selected?'#FF0000':''}} key={`square${props.row*9+props.col}`} onClick={() => this.props.move(props.row*9+props.col)}>{pieceChar(props.p)}</td>
     )
 
     const fields = [...Array(9).keys()].map(i =>
@@ -85,6 +100,16 @@ class Board extends React.Component<{board: Piece[], selected: number, clickHand
       <table className="board">
         {fields}
       </table>
+    )
+  }
+}
+
+class Stand extends React.Component<{stand: Piece[], move: (_: number) => void, isBlack: boolean}> {
+  render() {
+    return (
+      <div className="stand" id={this.props.isBlack?'black-stand':'white-stand'}>
+        {this.props.stand.map(p => <span>{pieceChar(p)}</span>)}
+      </div>
     )
   }
 }
