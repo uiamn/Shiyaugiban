@@ -1,0 +1,15 @@
+.board {
+    width: 600px;
+    height: 600px;
+    border: 'solid 1px';
+    border-collapse: collapse;
+}
+
+.board > tr {
+    height: 11%;
+}
+
+.board > tr > td {
+    width: 11%;
+    font-size: 24px;
+}

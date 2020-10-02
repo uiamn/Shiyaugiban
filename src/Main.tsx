@@ -1,9 +1,10 @@
 import React from 'react'
-import { Piece, isEnemy } from './Piece'
+import { Piece, isEnemy, promote, isPromoted } from './Piece'
 import { isLegalMove } from './isLegalMove'
+import './Board.css'
 
 const pieceChar = (p: Piece) => {
-  const pc = [' 　', '歩', '香', '桂', '銀', '金', '角', '飛', '王']
+  const pc = [' 　', '歩', '香', '桂', '銀', '金', '角', '飛', '王', 'と', '杏', '圭', '全', '馬', '龍']
   return isEnemy(p)?('v'+pc[p-Piece.RY]):(' '+pc[p])
 }
 
@@ -53,7 +54,11 @@ class Main extends React.Component<{}, IMainState> {
       }
     } else {
       if(isLegalMove(this.state.selected, i, this.state.board)) {
-        const newBoard = this.state.board.map((p, j) => j===i?this.state.board[this.state.selected]:j===this.state.selected?Piece.EMPTY:p)
+        const newPiece = ((this.state.isMyTurn && i < 27) || (!this.state.isMyTurn && i > 53)) && !isPromoted(this.state.board[this.state.selected]) && window.confirm('promotion?')
+                         ?promote(this.state.board[this.state.selected])
+                         :this.state.board[this.state.selected]
+
+        const newBoard = this.state.board.map((p, j) => j===i?newPiece:j===this.state.selected?Piece.EMPTY:p)
         this.setState({selected: -1, board: newBoard, isMyTurn: !this.state.isMyTurn})
       } else if(this.state.board[i] !== Piece.EMPTY && (this.state.isMyTurn !== isEnemy(this.state.board[i]))) {
         this.setState({selected: i})
@@ -77,7 +82,7 @@ class Board extends React.Component<{board: Piece[], selected: number, clickHand
     )
 
     return (
-      <table style={{border: 'solid 1px', borderCollapse: 'collapse'}}>
+      <table className="board">
         {fields}
       </table>
     )
