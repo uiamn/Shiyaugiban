@@ -1,6 +1,6 @@
 import { Piece } from '../Piece'
 
-export default interface IBoard {
+export interface IBoard {
   board: Piece[]
   selected: number
   isBlackTurn: boolean

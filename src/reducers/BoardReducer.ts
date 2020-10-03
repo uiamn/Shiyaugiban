@@ -1,6 +1,6 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers'
 import { changeBoardAction } from '../actions/BoardActions'
-import IBoard from '../states/IBoard'
+import { IBoard } from '../states/IBoard'
 import { Piece } from '../Piece'
 
 const initBoard: IBoard = {
@@ -21,8 +21,6 @@ const initBoard: IBoard = {
   wStand: []
 }
 
-const boardReducer = reducerWithInitialState<IBoard>(initBoard)
+export const boardReducer = reducerWithInitialState<IBoard>(initBoard)
   .case(changeBoardAction, (state, payload) => ({...state, ...payload}))
   .build();
-
-export default boardReducer;

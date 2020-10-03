@@ -1,6 +1,7 @@
 import { Piece, isEnemy, promote, isPromoted, disPromote } from './Piece'
 import { changeBoardAction } from './actions/BoardActions';
-import Store from './Store';
+import { store } from './Store';
+import { addMove } from './record'
 
 const isLegalMove = (from: number, to: number, board: Piece[]) => {
   if(from < 81) return movePieceOnBoard(from, to, board)
@@ -141,9 +142,11 @@ const movePieceOnStand = (from: number, to: number, board: Piece[]) => {
   return board[to] === Piece.EMPTY
 }
 
-export const move = (i: number) => {
-  const { board, selected, isBlackTurn, bStand, wStand } = Store.getState().board
-  const dispatch = Store.dispatch
+export const changeSide = (p: Piece) => (isPromoted(p)?disPromote(p):p) + (isEnemy(p)?-14:14)
+
+export const moveHandler = (i: number) => {
+  const { board, selected, isBlackTurn, bStand, wStand } = store.getState().board
+  const dispatch = store.dispatch
 
   if(selected === -1) {
     if(board[i] !== Piece.EMPTY && (isBlackTurn !== isEnemy(board[i]))) {
@@ -154,33 +157,43 @@ export const move = (i: number) => {
   } else {
     if(isLegalMove(selected, i, board)) {
       const newStand = isBlackTurn?bStand:wStand
+      let newPiece: Piece,
+          newBoard: Piece[],
+          takenPiece: Piece | undefined,
+          hasPromoted: boolean | undefined
 
       if(selected < 81) {
         // move piece on board
-        const newPiece = ((isBlackTurn && i < 27) || (!isBlackTurn && i > 53)) && !isPromoted(board[selected]) && window.confirm('promotion?')
-                        ?promote(board[selected])
-                        :board[selected]
+        if(((isBlackTurn && i < 27) || (!isBlackTurn && i > 53)) && !isPromoted(board[selected])) {
+          if(window.confirm('promotion?')) {
+            newPiece = promote(board[selected])
+            hasPromoted = true
+          } else {
+            newPiece = board[selected]
+            hasPromoted = false
+          }
+        } else {
+          newPiece = board[selected]
+          hasPromoted = undefined
+        }
 
-        const newBoard = board.map((p, j) => j===i?newPiece:j===selected?Piece.EMPTY:p)
+        newBoard = board.map((p, j) => j===i?newPiece:j===selected?Piece.EMPTY:p)
 
-        const takenPiece = board[i]===Piece.EMPTY?undefined:isPromoted(board[i])?disPromote(board[i]):board[i]
-        if(takenPiece !== undefined) newStand.push(takenPiece + (isBlackTurn?-14:14))
-
-        const newState = {selected: -1, board: newBoard, isBlackTurn: !isBlackTurn}
-        Object.assign(newState, {[(isBlackTurn?'bStand':'wStand')]: newStand})
-
-        dispatch(changeBoardAction(newState))
+        takenPiece = board[i]===Piece.EMPTY?undefined:changeSide(board[i])
+        if(takenPiece !== undefined) newStand.push(takenPiece)
       } else {
         // move piece on stand
-        const newPiece = isBlackTurn?(Piece.HI+81-selected):(Piece.EHI+88-selected)
-        const newBoard = board.map((p, j) => j===i?newPiece:p)
+        newPiece = isBlackTurn?(Piece.HI+81-selected):(Piece.EHI+88-selected)
+        newBoard = board.map((p, j) => j===i?newPiece:p)
         newStand.splice(newStand.indexOf(newPiece), 1)
-        console.log(newStand)
-        const newState = {selected: -1, board: newBoard, isBlackTurn: !isBlackTurn}
-
-        Object.assign(newState, {[(isBlackTurn?'bStand':'wStand')]: newStand})
-        dispatch(changeBoardAction(newState))
       }
+
+      const newState = {selected: -1, board: newBoard, isBlackTurn: !isBlackTurn}
+
+      Object.assign(newState, {[(isBlackTurn?'bStand':'wStand')]: newStand})
+      dispatch(changeBoardAction(newState))
+
+      addMove(selected, i, hasPromoted?disPromote(newPiece):newPiece, hasPromoted, takenPiece)
 
     } else if(board[i] !== Piece.EMPTY && (isBlackTurn !== isEnemy(board[i]))) {
       dispatch(changeBoardAction({selected: i}))
