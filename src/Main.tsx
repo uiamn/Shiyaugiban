@@ -1,5 +1,5 @@
 import React from 'react'
-import { Piece, isEnemy, pieceChar } from './Piece'
+import { Piece, isWhite, pieceChar } from './Piece'
 import { moveHandler } from './move'
 import './Board.css'
 import { useDispatch, useSelector } from 'react-redux';

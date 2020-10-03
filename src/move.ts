@@ -1,4 +1,4 @@
-import { Piece, isEnemy, promote, isPromoted, disPromote } from './Piece'
+import { Piece, isWhite, promote, isPromoted, disPromote } from './Piece'
 import { changeBoardAction } from './actions/BoardActions';
 import { store } from './Store';
 import { addMove } from './record'
@@ -11,22 +11,22 @@ const isLegalMove = (from: number, to: number, board: Piece[]) => {
 const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
   const mvPiece = board[from]
 
-  if(mvPiece === Piece.EMPTY || (board[to] !== Piece.EMPTY && isEnemy(mvPiece) === isEnemy(board[to]))) return false
+  if(mvPiece === Piece.EMPTY || (board[to] !== Piece.EMPTY && isWhite(mvPiece) === isWhite(board[to]))) return false
 
   const legalSquares: Piece[] = []
 
   switch (mvPiece) {
     case Piece.FU:
     case Piece.EFU:
-      legalSquares.push(from + (isEnemy(mvPiece)?9:-9))
+      legalSquares.push(from + (isWhite(mvPiece)?9:-9))
       break
 
     case Piece.KY:
     case Piece.EKY:
-      const d = isEnemy(mvPiece)?9:-9
+      const d = isWhite(mvPiece)?9:-9
       for(let i=from+d; (-1<i && i<81); i+=d)
         if(board[i] === Piece.EMPTY) legalSquares.push(i)
-        else if(isEnemy(board[from]) !== isEnemy(board[i])) {
+        else if(isWhite(board[from]) !== isWhite(board[i])) {
           legalSquares.push(i)
           break
         } else break
@@ -83,7 +83,7 @@ const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
       for(let j of [8, -8, 10, -10]) {
         for(let i=from+j; (-1<i && i<81); i+=j) {
           if(board[i] === Piece.EMPTY) legalSquares.push(i)
-          else if(isEnemy(board[from]) !== isEnemy(board[i])) {
+          else if(isWhite(board[from]) !== isWhite(board[i])) {
             legalSquares.push(i)
             break
           } else break
@@ -106,7 +106,7 @@ const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
       for(let j of [1, -1, 9, -9]) {
         for(let i=from+j; (-1<i && i<81); i+=j) {
           if(board[i] === Piece.EMPTY) legalSquares.push(i)
-          else if(isEnemy(board[from]) !== isEnemy(board[i])) {
+          else if(isWhite(board[from]) !== isWhite(board[i])) {
             legalSquares.push(i)
             break
           } else break
@@ -142,14 +142,14 @@ const movePieceOnStand = (from: number, to: number, board: Piece[]) => {
   return board[to] === Piece.EMPTY
 }
 
-export const changeSide = (p: Piece) => (isPromoted(p)?disPromote(p):p) + (isEnemy(p)?-14:14)
+export const changeSide = (p: Piece) => (isPromoted(p)?disPromote(p):p) + (isWhite(p)?-14:14)
 
 export const moveHandler = (i: number) => {
   const { board, selected, isBlackTurn, bStand, wStand } = store.getState().board
   const dispatch = store.dispatch
 
   if(selected === -1) {
-    if(board[i] !== Piece.EMPTY && (isBlackTurn !== isEnemy(board[i]))) {
+    if(board[i] !== Piece.EMPTY && (isBlackTurn !== isWhite(board[i]))) {
       dispatch(changeBoardAction({selected: i}))
     } else {
       dispatch(changeBoardAction({selected: -1}))
@@ -195,7 +195,7 @@ export const moveHandler = (i: number) => {
 
       addMove(selected, i, hasPromoted?disPromote(newPiece):newPiece, hasPromoted, takenPiece)
 
-    } else if(board[i] !== Piece.EMPTY && (isBlackTurn !== isEnemy(board[i]))) {
+    } else if(board[i] !== Piece.EMPTY && (isBlackTurn !== isWhite(board[i]))) {
       dispatch(changeBoardAction({selected: i}))
     } else {
       dispatch(changeBoardAction({selected: -1}))

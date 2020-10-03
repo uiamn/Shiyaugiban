@@ -6,22 +6,22 @@ export enum Piece {
 
 export const pieceChar = (p: Piece) => {
   const pc = [' 　', '歩', '香', '桂', '銀', '金', '角', '飛', '王', 'と', '杏', '圭', '全', '馬', '龍']
-  return isEnemy(p)?('v'+pc[p-Piece.RY]):(' '+pc[p])
+  return isWhite(p)?('v'+pc[p-Piece.RY]):(' '+pc[p])
 }
 
-export const isEnemy = (p: Piece) => p > Piece.RY
+export const isWhite = (p: Piece) => p > Piece.RY
 export const promote = (p: Piece) => {
   if(isPromoted(p)) return p
 
-  if((!isEnemy(p) && p < Piece.KI) || (isEnemy(p) && p < Piece.EKI)) return p + 8
+  if((!isWhite(p) && p < Piece.KI) || (isWhite(p) && p < Piece.EKI)) return p + 8
   else return p + 7
 }
 
 export const disPromote = (p: Piece) => {
   if(!isPromoted(p)) return p
 
-  if((!isEnemy(p) && p < Piece.UM) || (isEnemy(p) && p < Piece.EUM)) return p - 8
+  if((!isWhite(p) && p < Piece.UM) || (isWhite(p) && p < Piece.EUM)) return p - 8
   else return p - 7
 }
 
-export const isPromoted = (p: Piece) => (!isEnemy(p) && Piece.OU < p) || (isEnemy(p) && Piece.EOU < p)
+export const isPromoted = (p: Piece) => (!isWhite(p) && Piece.OU < p) || (isWhite(p) && Piece.EOU < p)
