@@ -1,6 +1,11 @@
 import { Piece, isEnemy } from './Piece'
 
 export const isLegalMove = (from: number, to: number, board: Piece[]) => {
+  if(from < 81) return movePieceOnBoard(from, to, board)
+  else return movePieceOnStand(from, to, board)
+}
+
+const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
   const mvPiece = board[from]
 
   if(mvPiece === Piece.EMPTY || (board[to] !== Piece.EMPTY && isEnemy(mvPiece) === isEnemy(board[to]))) return false
@@ -124,4 +129,12 @@ export const isLegalMove = (from: number, to: number, board: Piece[]) => {
   }
 
   return legalSquares.indexOf(to) !== -1
+}
+
+const movePieceOnStand = (from: number, to: number, board: Piece[]) => {
+  if(from === 87 || from === 94) {
+    for(let i=0; i<9; i++) if(board[9*i+(to%9)] === (from===87?Piece.FU:Piece.EFU)) return false
+  }
+
+  return board[to] === Piece.EMPTY
 }

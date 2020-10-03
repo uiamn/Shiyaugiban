@@ -25,20 +25,35 @@ const move = (i: number) => {
     }
   } else {
     if(isLegalMove(selected, i, board)) {
-      const newPiece = ((isBlackTurn && i < 27) || (!isBlackTurn && i > 53)) && !isPromoted(board[selected]) && window.confirm('promotion?')
-                       ?promote(board[selected])
-                       :board[selected]
+      if(selected < 81) {
+        // move piece on board
+        const newPiece = ((isBlackTurn && i < 27) || (!isBlackTurn && i > 53)) && !isPromoted(board[selected]) && window.confirm('promotion?')
+                        ?promote(board[selected])
+                        :board[selected]
 
-      const newBoard = board.map((p, j) => j===i?newPiece:j===selected?Piece.EMPTY:p)
+        const newBoard = board.map((p, j) => j===i?newPiece:j===selected?Piece.EMPTY:p)
 
-      const takenPiece = board[i]===Piece.EMPTY?undefined:isPromoted(board[i])?disPromote(board[i]):board[i]
-      const newStand = (isBlackTurn?bStand:wStand)
-      if(takenPiece !== undefined) newStand.push(takenPiece + (isBlackTurn?-14:14))
+        const takenPiece = board[i]===Piece.EMPTY?undefined:isPromoted(board[i])?disPromote(board[i]):board[i]
+        const newStand = (isBlackTurn?bStand:wStand)
+        if(takenPiece !== undefined) newStand.push(takenPiece + (isBlackTurn?-14:14))
 
-      const newState = {selected: -1, board: newBoard, isBlackTurn: !isBlackTurn}
-      Object.assign(newState, {[(isBlackTurn?'bStand':'wStand')]: newStand})
+        const newState = {selected: -1, board: newBoard, isBlackTurn: !isBlackTurn}
+        Object.assign(newState, {[(isBlackTurn?'bStand':'wStand')]: newStand})
 
-      dispatch(changeBoardAction(newState))
+        dispatch(changeBoardAction(newState))
+      } else {
+        // move piece on stand
+        const newPiece = isBlackTurn?(Piece.HI+81-selected):(Piece.EHI+88-selected)
+        const newBoard = board.map((p, j) => j===i?newPiece:p)
+        const newStand = isBlackTurn?bStand:wStand
+        newStand.splice(newStand.indexOf(newPiece), 1)
+        console.log(newStand)
+        const newState = {selected: -1, board: newBoard, isBlackTurn: !isBlackTurn}
+
+        Object.assign(newState, {[(isBlackTurn?'bStand':'wStand')]: newStand})
+        dispatch(changeBoardAction(newState))
+      }
+
     } else if(board[i] !== Piece.EMPTY && (isBlackTurn !== isEnemy(board[i]))) {
       dispatch(changeBoardAction({selected: i}))
     } else {
@@ -53,8 +68,8 @@ const Main: React.FC = () => {
     <div style={{border: 'solid 1px blue', display: 'flex', height: 600}}>
       <Board/>
       <div id="stands">
-        <Stand isBlack={true} />
         <Stand isBlack={false} />
+        <Stand isBlack={true} />
       </div>
     </div>
   )
@@ -80,16 +95,29 @@ const Board: React.FC = () => {
   )
 }
 
-const Stand: React.FC<{isBlack: boolean}> = (isBlack) => {
+const Stand: React.FC<{isBlack: boolean}> = (props) => {
+  const { board, selected, isBlackTurn, bStand, wStand } = useSelector<IState, IBoard>(a => a.board)
+  const dispatch = useDispatch()
+  const select = (i: number) => {
+    if(isBlackTurn === (i < 88)) dispatch(changeBoardAction({selected: i}))
+  }
+
+  const PieceOnStand: React.FC<{p: Piece, i: number}> = (p) => {
+    const nPiece = (props.isBlack?bStand:wStand).filter(q => p.p===q).length
+    if(nPiece) return <td style={{backgroundColor: selected===p.i?'#FF0000':''}} onClick={() => select(p.i)}>{pieceChar(p.p)} x {nPiece}</td>
+    else return <td/>
+  }
+
   return (
-    <table className="stand" id={isBlack?'black-stand':'white-stand'}>
-      <tr><td>1</td><td>2</td></tr>
-      <tr><td>1</td><td>2</td></tr>
-      <tr><td>1</td><td>2</td></tr>
-      <tr><td>1</td><td>2</td></tr>
+    <table className="stand" id={props.isBlack?'black-stand':'white-stand'}>
+      {
+        [...Array(4).keys()].map((_, i) => <tr>
+          <PieceOnStand p={(props.isBlack?Piece.HI:Piece.EHI)-2*i} i={(props.isBlack?81:88)+2*i} />
+          {i===3?<td/>:<PieceOnStand p={(props.isBlack?Piece.HI:Piece.EHI)-2*i-1} i={(props.isBlack?81:88)+2*i+1} />}
+        </tr>)
+      }
     </table>
   )
-  // {this.props.stand.map(p => <span>{pieceChar(p)}</span>)}
 }
 
 export default Main
