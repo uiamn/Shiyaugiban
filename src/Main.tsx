@@ -1,67 +1,16 @@
-import React, { useCallback } from 'react'
-import { Piece, isEnemy, promote, isPromoted, disPromote } from './Piece'
-import { isLegalMove } from './isLegalMove'
+import React from 'react'
+import { Piece, isEnemy } from './Piece'
+import { move } from './move'
 import './Board.css'
 import { useDispatch, useSelector } from 'react-redux';
 import { changeBoardAction } from './actions/BoardActions';
 import { IState } from './states/IState';
 import IBoard from './states/IBoard';
-import Store from './Store';
 
 const pieceChar = (p: Piece) => {
   const pc = [' 　', '歩', '香', '桂', '銀', '金', '角', '飛', '王', 'と', '杏', '圭', '全', '馬', '龍']
   return isEnemy(p)?('v'+pc[p-Piece.RY]):(' '+pc[p])
 }
-
-const move = (i: number) => {
-  const { board, selected, isBlackTurn, bStand, wStand } = Store.getState().board
-  const dispatch = Store.dispatch
-
-  if(selected === -1) {
-    if(board[i] !== Piece.EMPTY && (isBlackTurn !== isEnemy(board[i]))) {
-      dispatch(changeBoardAction({selected: i}))
-    } else {
-      dispatch(changeBoardAction({selected: -1}))
-    }
-  } else {
-    if(isLegalMove(selected, i, board)) {
-      if(selected < 81) {
-        // move piece on board
-        const newPiece = ((isBlackTurn && i < 27) || (!isBlackTurn && i > 53)) && !isPromoted(board[selected]) && window.confirm('promotion?')
-                        ?promote(board[selected])
-                        :board[selected]
-
-        const newBoard = board.map((p, j) => j===i?newPiece:j===selected?Piece.EMPTY:p)
-
-        const takenPiece = board[i]===Piece.EMPTY?undefined:isPromoted(board[i])?disPromote(board[i]):board[i]
-        const newStand = (isBlackTurn?bStand:wStand)
-        if(takenPiece !== undefined) newStand.push(takenPiece + (isBlackTurn?-14:14))
-
-        const newState = {selected: -1, board: newBoard, isBlackTurn: !isBlackTurn}
-        Object.assign(newState, {[(isBlackTurn?'bStand':'wStand')]: newStand})
-
-        dispatch(changeBoardAction(newState))
-      } else {
-        // move piece on stand
-        const newPiece = isBlackTurn?(Piece.HI+81-selected):(Piece.EHI+88-selected)
-        const newBoard = board.map((p, j) => j===i?newPiece:p)
-        const newStand = isBlackTurn?bStand:wStand
-        newStand.splice(newStand.indexOf(newPiece), 1)
-        console.log(newStand)
-        const newState = {selected: -1, board: newBoard, isBlackTurn: !isBlackTurn}
-
-        Object.assign(newState, {[(isBlackTurn?'bStand':'wStand')]: newStand})
-        dispatch(changeBoardAction(newState))
-      }
-
-    } else if(board[i] !== Piece.EMPTY && (isBlackTurn !== isEnemy(board[i]))) {
-      dispatch(changeBoardAction({selected: i}))
-    } else {
-      dispatch(changeBoardAction({selected: -1}))
-    }
-  }
-}
-
 
 const Main: React.FC = () => {
   return (
