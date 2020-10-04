@@ -6,7 +6,7 @@ export enum Piece {
 
 export const pieceChar = (p: Piece) => {
   const pc = [' 　', '歩', '香', '桂', '銀', '金', '角', '飛', '王', 'と', '杏', '圭', '全', '馬', '龍']
-  return isWhite(p)?('v'+pc[p-Piece.RY]):(' '+pc[p])
+  return isWhite(p)?(pc[p-Piece.RY]):(pc[p])
 }
 
 export const isWhite = (p: Piece) => p > Piece.RY
