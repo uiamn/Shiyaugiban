@@ -1,6 +1,6 @@
 # Shiyaugiban
 
-A shougi application based on Electron
+A shogi application based on Electron
 
 ## Getting started
 ```shell
