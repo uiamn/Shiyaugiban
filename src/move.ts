@@ -164,7 +164,7 @@ export const moveHandler = (i: number) => {
 
       if(selected < 81) {
         // move piece on board
-        if(((isBlackTurn && i < 27) || (!isBlackTurn && i > 53)) && !isPromoted(board[selected])) {
+        if(((isBlackTurn && (i < 27 || selected < 27)) || (!isBlackTurn && (i > 53 || selected > 53))) && !isPromoted(board[selected])) {
           if(window.confirm('promotion?')) {
             newPiece = promote(board[selected])
             hasPromoted = true
