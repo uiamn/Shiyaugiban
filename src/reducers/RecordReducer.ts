@@ -4,7 +4,8 @@ import { IRecord } from '../states/IRecord'
 import { Piece } from '../Piece'
 
 const initRecord: IRecord = {
-  record: []
+  record: [],
+  pointer: 0
 }
 
 export const recordReducer = reducerWithInitialState<IRecord>(initRecord)

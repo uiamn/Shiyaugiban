@@ -1,7 +1,7 @@
 import { Piece, isWhite, promote, isPromoted, disPromote } from './Piece'
 import { changeBoardAction } from './actions/BoardActions';
 import { store } from './Store';
-import { addMove } from './record'
+import { addMove } from './recordHandlers'
 
 const isLegalMove = (from: number, to: number, board: Piece[]) => {
   if(from < 81) return movePieceOnBoard(from, to, board)
@@ -179,8 +179,8 @@ export const moveHandler = (i: number) => {
 
         newBoard = board.map((p, j) => j===i?newPiece:j===selected?Piece.EMPTY:p)
 
-        takenPiece = board[i]===Piece.EMPTY?undefined:changeSide(board[i])
-        if(takenPiece !== undefined) newStand.push(takenPiece)
+        takenPiece = board[i]===Piece.EMPTY?undefined:board[i]
+        if(takenPiece !== undefined) newStand.push(changeSide(takenPiece))
       } else {
         // move piece on stand
         newPiece = isBlackTurn?(Piece.HI+81-selected):(Piece.EHI+88-selected)

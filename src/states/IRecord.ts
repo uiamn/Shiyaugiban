@@ -5,5 +5,6 @@ export type tMove = {
 }
 
 export interface IRecord {
-  record: tMove[]
+  record: tMove[],
+  pointer: number
 }

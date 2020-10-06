@@ -7,17 +7,24 @@ import { changeBoardAction } from './actions/BoardActions';
 import { IState } from './states/IState';
 import { IBoard } from './states/IBoard';
 import { RecordView } from './RecordView'
+import { moveBack, moveForward } from './recordHandlers'
 
 const Main: React.FC = () => {
   return (
-    <div style={{border: 'solid 1px blue', display: 'flex', height: 600}}>
-      <Board/>
-      <div id="stands">
-        <Stand isBlack={false} />
-        <Stand isBlack={true} />
+    <div>
+      <div>
+        <button onClick={moveBack}>{"<"}</button>
+        <button onClick={moveForward}>{">"}</button>
       </div>
+      <div style={{border: 'solid 1px blue', display: 'flex', height: 600}}>
+        <Board/>
+        <div id="stands">
+          <Stand isBlack={false} />
+          <Stand isBlack={true} />
+        </div>
 
-      <RecordView />
+        <RecordView />
+      </div>
     </div>
   )
 }
@@ -27,7 +34,7 @@ const pieceToImg = (p: Piece) => {
   else {
     const pieceArr = ['FU', 'KY', 'KE', 'GI', 'KI', 'KA', 'HI', 'OU', 'TO', 'NY', 'NK', 'NG', 'UM', 'RY']
     const isW = isWhite(p)
-    return <img src={`svg/piece/${isW?1:0}${pieceArr[(isW?p-14:p)-1]}.svg`} />
+    return <img className="piece-image" src={`svg/piece/${isW?1:0}${pieceArr[(isW?p-14:p)-1]}.svg`} />
   }
 }
 
