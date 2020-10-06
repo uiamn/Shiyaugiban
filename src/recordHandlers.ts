@@ -4,7 +4,7 @@ import { store } from './Store'
 import { Piece, promote, disPromote, isPromoted } from './Piece'
 import { changeSide } from './move'
 
-export const addMove = (from: number, to: number, piece: Piece, hasPromoted?: boolean, takenPiece?: Piece) => {
+export const addMove = (from: number | undefined, to: number, piece: Piece, hasPromoted?: boolean, takenPiece?: Piece) => {
   const { record, pointer } = store.getState().record
   const dispatch = store.dispatch
 
@@ -19,14 +19,19 @@ export const moveBack = () => {
   const { board, selected, isBlackTurn, bStand, wStand } = store.getState().board
   const dispatch = store.dispatch
 
+  const stand = (isBlackTurn?wStand:bStand)
+
   const lastMove = record[pointer-1]
-  if(lastMove === undefined) return
-  board[lastMove.from] = lastMove.hasPromoted?disPromote(board[lastMove.to]):board[lastMove.to]
+
+  if(lastMove === undefined) return // when a board is an initial one
+
+  if(lastMove.from === undefined) stand.push(lastMove.piece)
+  else board[lastMove.from] = lastMove.hasPromoted?disPromote(lastMove.piece):lastMove.piece
 
   if(lastMove.takenPiece === undefined) board[lastMove.to] = Piece.EMPTY
   else {
     board[lastMove.to] = lastMove.takenPiece;
-    (isBlackTurn?wStand:bStand).splice((isBlackTurn?wStand:bStand).indexOf(changeSide(lastMove.takenPiece)), 1)
+    stand.splice(stand.indexOf(changeSide(lastMove.takenPiece)), 1)
   }
 
   dispatch(changeRecordAction({pointer: pointer-1}))
@@ -39,9 +44,17 @@ export const moveForward = () => {
   const dispatch = store.dispatch
 
   const nextMove = record[pointer]
-  if(nextMove === undefined) return
-  board[nextMove.to] = nextMove.hasPromoted?promote(board[nextMove.from]):board[nextMove.from]
-  board[nextMove.from] = Piece.EMPTY
+
+  if(nextMove === undefined) return // when a board is a latest one
+
+  if(nextMove.from === undefined) {
+    const stand = isBlackTurn?wStand:bStand
+    stand.splice(stand.indexOf(changeSide(nextMove.piece)), 1)
+    board[nextMove.to] = nextMove.piece
+  } else {
+    board[nextMove.to] = nextMove.hasPromoted?promote(board[nextMove.from]):board[nextMove.from]
+    board[nextMove.from] = Piece.EMPTY
+  }
   if(nextMove.takenPiece !== undefined) (isBlackTurn?bStand:wStand).push(changeSide(nextMove.takenPiece))
 
   dispatch(changeRecordAction({pointer: pointer+1}))

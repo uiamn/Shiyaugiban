@@ -193,7 +193,7 @@ export const moveHandler = (i: number) => {
       Object.assign(newState, {[(isBlackTurn?'bStand':'wStand')]: newStand})
       dispatch(changeBoardAction(newState))
 
-      addMove(selected, i, hasPromoted?disPromote(newPiece):newPiece, hasPromoted, takenPiece)
+      addMove(selected<81?selected:undefined, i, hasPromoted?disPromote(newPiece):newPiece, hasPromoted, takenPiece)
 
     } else if(board[i] !== Piece.EMPTY && (isBlackTurn !== isWhite(board[i]))) {
       dispatch(changeBoardAction({selected: i}))

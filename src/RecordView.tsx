@@ -4,7 +4,7 @@ import { IState } from './states/IState'
 import { IRecord, tMove } from './states/IRecord'
 import { pieceChar } from './Piece'
 
-const moveToText = (m: tMove) => `${(9-m.to%9)}${(m.to/9 | 0)+1}${pieceChar(m.piece)}${m.hasPromoted===undefined?'':m.hasPromoted?'成':'不成'}${m.from<81?`(${9-m.from%9}${(m.from/9 | 0) + 1})`:''}`
+const moveToText = (m: tMove) => `${(9-m.to%9)}${(m.to/9 | 0)+1}${pieceChar(m.piece)}${m.hasPromoted===undefined?'':m.hasPromoted?'成':'不成'}${m.from?`(${9-m.from%9}${(m.from/9 | 0) + 1})`:''}`
 
 export const RecordView: React.FC = () => {
     const { record, pointer } = useSelector<IState, IRecord>(a => a.record)
