@@ -61,6 +61,7 @@ const legalSquares = (from: number, board: Piece[]) => {
         legalSq.push(from-8)
         legalSq.push(from+(mvPiece===Piece.GI?10:1))
       }
+      if(from < 71) legalSq.push(from+9)
     break
 
     case Piece.EGI:
@@ -78,6 +79,7 @@ const legalSquares = (from: number, board: Piece[]) => {
         legalSq.push(from+10)
         legalSq.push(from+(mvPiece===Piece.EGI?-8:1))
       }
+      if(from > 8) legalSq.push(from-9)
     break
 
     case Piece.KA:
