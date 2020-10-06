@@ -1,7 +1,6 @@
 .board {
     width: 600px;
     height: 100%;
-    border: solid 1px;
     border-collapse: collapse;
     align-items: center;
 }
@@ -27,7 +26,6 @@
 
 #stands {
     height: 100%;
-    border: solid 1px red;
 }
 
 .stand {

@@ -16,7 +16,7 @@ const Main: React.FC = () => {
         <button onClick={moveBack}>{"<"}</button>
         <button onClick={moveForward}>{">"}</button>
       </div>
-      <div style={{border: 'solid 1px blue', display: 'flex', height: 600}}>
+      <div style={{display: 'flex', height: 600}}>
         <Board/>
         <div id="stands">
           <Stand isBlack={false} />
