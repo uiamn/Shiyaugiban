@@ -18,10 +18,18 @@ export const promote = (p: Piece) => {
 }
 
 export const disPromote = (p: Piece) => {
-  if(!isPromoted(p)) return p
+  if(!isPromoted(p) || p === Piece.KI || p === Piece.EKI) return p
 
   if((!isWhite(p) && p < Piece.UM) || (isWhite(p) && p < Piece.EUM)) return p - 8
   else return p - 7
 }
 
-export const isPromoted = (p: Piece) => (!isWhite(p) && Piece.OU < p) || (isWhite(p) && Piece.EOU < p)
+export const isPromoted = (p: Piece) => (
+  // Kin and Ou are handled as promoted pieces
+  (!isWhite(p) && (
+    (Piece.OU <= p) || (p === Piece.KI)
+  )) ||
+  (isWhite(p) && (
+    (Piece.EOU < p) || (p === Piece.EKI)
+  ))
+)
