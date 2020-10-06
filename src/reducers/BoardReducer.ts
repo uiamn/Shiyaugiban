@@ -3,7 +3,7 @@ import { changeBoardAction } from '../actions/BoardActions'
 import { IBoard } from '../states/IBoard'
 import { Piece } from '../Piece'
 
-const initBoard: IBoard = {
+export const initBoard: IBoard = {
   board: [
     Piece.EKY, Piece.EKE, Piece.EGI, Piece.EKI, Piece.EOU, Piece.EKI, Piece.EGI, Piece.EKE, Piece.EKY,
     Piece.EMPTY, Piece.EHI, Piece.EMPTY, Piece.EMPTY, Piece.EMPTY, Piece.EMPTY, Piece.EMPTY, Piece.EKA, Piece.EMPTY,

@@ -8,11 +8,13 @@ import { IState } from './states/IState';
 import { IBoard } from './states/IBoard';
 import { RecordView } from './RecordView'
 import { moveBack, moveForward } from './recordHandlers'
+import { initialize } from './initialize'
 
 const Main: React.FC = () => {
   return (
     <div>
       <div>
+        <button onClick={initialize}>init</button>
         <button onClick={moveBack}>{"<"}</button>
         <button onClick={moveForward}>{">"}</button>
       </div>

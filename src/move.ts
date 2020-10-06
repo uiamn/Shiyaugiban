@@ -156,7 +156,7 @@ export const moveHandler = (i: number) => {
     }
   } else {
     if(isLegalMove(selected, i, board)) {
-      const newStand = isBlackTurn?bStand:wStand
+      const newStand = [...isBlackTurn?bStand:wStand]
       let newPiece: Piece,
           newBoard: Piece[],
           takenPiece: Piece | undefined,

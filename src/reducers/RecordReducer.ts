@@ -3,7 +3,7 @@ import { changeRecordAction } from '../actions/RecordAction'
 import { IRecord } from '../states/IRecord'
 import { Piece } from '../Piece'
 
-const initRecord: IRecord = {
+export const initRecord: IRecord = {
   record: [],
   pointer: 0
 }
