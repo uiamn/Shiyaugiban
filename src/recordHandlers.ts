@@ -45,7 +45,9 @@ export const moveForward = () => {
   const dispatch = store.dispatch
 
   const nextMove = record[pointer]
-  const stand = [...(isBlackTurn?wStand:bStand)]
+  const stand = [...(isBlackTurn?bStand:wStand)]
+
+  console.log(nextMove)
 
   if(nextMove === undefined) return // when a board is a latest one
 
@@ -59,5 +61,5 @@ export const moveForward = () => {
   if(nextMove.takenPiece !== undefined) stand.push(changeSide(nextMove.takenPiece))
 
   dispatch(changeRecordAction({pointer: pointer+1}))
-  dispatch(changeBoardAction({board: board, selected: -1, isBlackTurn: !isBlackTurn, ...{[isBlackTurn?'wStand':'bStand']: stand}}))
+  dispatch(changeBoardAction({board: board, selected: -1, isBlackTurn: !isBlackTurn, ...{[isBlackTurn?'bStand':'wStand']: stand}}))
 }
