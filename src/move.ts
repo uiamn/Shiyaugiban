@@ -10,36 +10,40 @@ const isLegalMove = (from: number, to: number, board: Piece[]) => {
 
 const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
   const mvPiece = board[from]
-
   if(mvPiece === Piece.EMPTY || (board[to] !== Piece.EMPTY && isWhite(mvPiece) === isWhite(board[to]))) return false
 
-  const legalSquares: Piece[] = []
+  return legalSquares(from, board).indexOf(to) !== -1
+}
+
+const legalSquares = (from: number, board: Piece[]) => {
+  const mvPiece = board[from]
+  const legalSq: Piece[] = []
 
   switch (mvPiece) {
     case Piece.FU:
     case Piece.EFU:
-      legalSquares.push(from + (isWhite(mvPiece)?9:-9))
+      legalSq.push(from + (isWhite(mvPiece)?9:-9))
       break
 
     case Piece.KY:
     case Piece.EKY:
       const d = isWhite(mvPiece)?9:-9
       for(let i=from+d; (-1<i && i<81); i+=d)
-        if(board[i] === Piece.EMPTY) legalSquares.push(i)
+        if(board[i] === Piece.EMPTY) legalSq.push(i)
         else if(isWhite(board[from]) !== isWhite(board[i])) {
-          legalSquares.push(i)
+          legalSq.push(i)
           break
         } else break
       break
 
     case Piece.KE:
-      if(from % 9 !== 0) legalSquares.push(from-19)
-      if(from % 9 !== 8) legalSquares.push(from-17)
+      if(from % 9 !== 0) legalSq.push(from-19)
+      if(from % 9 !== 8) legalSq.push(from-17)
       break
 
     case Piece.EKE:
-      if(from % 9 !== 0) legalSquares.push(from+17)
-      if(from % 9 !== 8) legalSquares.push(from+19)
+      if(from % 9 !== 0) legalSq.push(from+17)
+      if(from % 9 !== 8) legalSq.push(from+19)
       break
 
     case Piece.GI:
@@ -48,14 +52,14 @@ const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
     case Piece.NY:
     case Piece.NK:
     case Piece.NG:
-      legalSquares.push(from-9)
+      legalSq.push(from-9)
       if(from % 9 !== 0) {
-        legalSquares.push(from-10)
-        legalSquares.push(from+(mvPiece===Piece.GI?8:-1))
+        legalSq.push(from-10)
+        legalSq.push(from+(mvPiece===Piece.GI?8:-1))
       }
       if(from % 9 !== 8) {
-        legalSquares.push(from-8)
-        legalSquares.push(from+(mvPiece===Piece.GI?10:1))
+        legalSq.push(from-8)
+        legalSq.push(from+(mvPiece===Piece.GI?10:1))
       }
     break
 
@@ -65,14 +69,14 @@ const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
     case Piece.ENY:
     case Piece.ENK:
     case Piece.ENG:
-      legalSquares.push(from+9)
+      legalSq.push(from+9)
       if(from % 9 !== 0) {
-        legalSquares.push(from+8)
-        legalSquares.push(from+(mvPiece===Piece.EGI?-10:-1))
+        legalSq.push(from+8)
+        legalSq.push(from+(mvPiece===Piece.EGI?-10:-1))
       }
       if(from % 9 !== 8) {
-        legalSquares.push(from+10)
-        legalSquares.push(from+(mvPiece===Piece.EGI?-8:1))
+        legalSq.push(from+10)
+        legalSq.push(from+(mvPiece===Piece.EGI?-8:1))
       }
     break
 
@@ -82,9 +86,9 @@ const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
     case Piece.EUM:
       for(let j of [8, -8, 10, -10]) {
         for(let i=from+j; (-1<i && i<81); i+=j) {
-          if(board[i] === Piece.EMPTY) legalSquares.push(i)
+          if(board[i] === Piece.EMPTY) legalSq.push(i)
           else if(isWhite(board[from]) !== isWhite(board[i])) {
-            legalSquares.push(i)
+            legalSq.push(i)
             break
           } else break
           if(i%9 === ((j===-8 || j===10)?8:0)) break
@@ -92,11 +96,10 @@ const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
       }
 
       if(mvPiece === Piece.UM || mvPiece === Piece.EUM) {
-        legalSquares.push(from-9, from+9)
-        if(from % 9 !== 0) legalSquares.push(from-1)
-        if(from % 9 !== 8) legalSquares.push(from+1)
+        legalSq.push(from-9, from+9)
+        if(from % 9 !== 0) legalSq.push(from-1)
+        if(from % 9 !== 8) legalSq.push(from+1)
       }
-
       break
 
     case Piece.HI:
@@ -105,9 +108,9 @@ const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
     case Piece.ERY:
       for(let j of [1, -1, 9, -9]) {
         for(let i=from+j; (-1<i && i<81); i+=j) {
-          if(board[i] === Piece.EMPTY) legalSquares.push(i)
+          if(board[i] === Piece.EMPTY) legalSq.push(i)
           else if(isWhite(board[from]) !== isWhite(board[i])) {
-            legalSquares.push(i)
+            legalSq.push(i)
             break
           } else break
           if(j*j !== 1 && i%9 === (i===1?8:0)) break
@@ -115,23 +118,23 @@ const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
       }
 
       if(mvPiece === Piece.RY || mvPiece === Piece.ERY) {
-        if(from % 9 !== 0) legalSquares.push(from-10, from+8)
-        if(from % 9 !== 8) legalSquares.push(from-8, from+10)
+        if(from % 9 !== 0) legalSq.push(from-10, from+8)
+        if(from % 9 !== 8) legalSq.push(from-8, from+10)
       }
       break
 
     case Piece.OU:
     case Piece.EOU:
-      legalSquares.push(from-9, from+9)
-      if(from % 9 !== 0) legalSquares.push(from-10, from-1, from+8)
-      if(from % 9 !== 8) legalSquares.push(from-8, from+1, from+10)
+      legalSq.push(from-9, from+9)
+      if(from % 9 !== 0) legalSq.push(from-10, from-1, from+8)
+      if(from % 9 !== 8) legalSq.push(from-8, from+1, from+10)
       break
 
     default:
       break;
   }
 
-  return legalSquares.indexOf(to) !== -1
+  return legalSq
 }
 
 const movePieceOnStand = (from: number, to: number, board: Piece[]) => {
