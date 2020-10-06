@@ -47,8 +47,6 @@ export const moveForward = () => {
   const nextMove = record[pointer]
   const stand = [...(isBlackTurn?bStand:wStand)]
 
-  console.log(nextMove)
-
   if(nextMove === undefined) return // when a board is a latest one
 
   if(nextMove.from === undefined) {
