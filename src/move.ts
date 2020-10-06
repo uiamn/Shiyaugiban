@@ -5,7 +5,7 @@ import { addMove } from './recordHandlers'
 
 const isLegalMove = (from: number, to: number, board: Piece[]) => {
   if(from < 81) return movePieceOnBoard(from, to, board)
-  else return movePieceOnStand(from, to, board)
+  else return dropPieceFromStand(from, to, board)
 }
 
 const movePieceOnBoard = (from: number, to: number, board: Piece[]) => {
@@ -137,12 +137,34 @@ const legalSquares = (from: number, board: Piece[]) => {
   return legalSq
 }
 
-const movePieceOnStand = (from: number, to: number, board: Piece[]) => {
+const isMovableFrom = (to: number, p: Piece) => {
+  if((p === Piece.FU || p === Piece.KY) && to < 9) return false // Fu and Kyo can't be dropped on first row.
+  if(p === Piece.KE && to < 18) return false // Keima can't be dropped on first row.
+  if((p === Piece.EFU || p === Piece.EKY) && to > 71) return false
+  if(p === Piece.EKE && to > 62) return false
+
+  return true
+}
+
+const dropPieceFromStand = (from: number, to: number, board: Piece[]) => {
+  if(board[to] !== Piece.EMPTY) return false
+
   if(from === 87 || from === 94) {
+    // check nifu (duplicate Fu in one col)
     for(let i=0; i<9; i++) if(board[9*i+(to%9)] === (from===87?Piece.FU:Piece.EFU)) return false
   }
 
-  return board[to] === Piece.EMPTY
+  if(85 <= from && from <= 87) {
+    if(from === 85 && !isMovableFrom(to, Piece.KE)) return false
+    else if(!isMovableFrom(to, Piece.KY)) return false
+  }
+
+  if(92 <= from && from <= 94) {
+    if(from === 92 && !isMovableFrom(to, Piece.EKE)) return false
+    else if(!isMovableFrom(to, Piece.EKY)) return false
+  }
+
+  return true
 }
 
 export const changeSide = (p: Piece) => (isPromoted(p)?disPromote(p):p) + (isWhite(p)?-14:14)
@@ -168,7 +190,7 @@ export const moveHandler = (i: number) => {
       if(selected < 81) {
         // move piece on board
         if(((isBlackTurn && (i < 27 || selected < 27)) || (!isBlackTurn && (i > 53 || selected > 53))) && !isPromoted(board[selected])) {
-          if(window.confirm('promotion?')) {
+          if(!isMovableFrom(i, board[selected]) || window.confirm('promotion?')) {
             newPiece = promote(board[selected])
             hasPromoted = true
           } else {
