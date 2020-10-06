@@ -43,3 +43,8 @@
     width: 66px;
     font-size: 24px;
 }
+
+.piece-image {
+    -webkit-user-drag:none;
+    -khtml-user-drag:none;
+}
