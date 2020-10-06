@@ -5,6 +5,8 @@ import { changeBoardAction } from './actions/BoardActions'
 import { store } from './Store'
 
 export const initialize = () => {
+  if(!window.confirm('initialize?')) return
+
   const dispatch = store.dispatch
   dispatch(changeBoardAction(initBoard))
   dispatch(changeRecordAction(initRecord))
